@@ -55,6 +55,7 @@ import soot.jimple.infoflow.ipc.IIPCManager;
 import soot.jimple.infoflow.results.InfoflowResults;
 import soot.jimple.infoflow.taintWrappers.ITaintPropagationWrapper;
 import soot.options.Options;
+import soot.jimple.infoflow.sgp.*; //KU - import sgp classes
 
 public class SetupApplication {
 
@@ -685,6 +686,14 @@ public class SetupApplication {
 		if (onResultsAvailable != null)
 			info.addResultsAvailableHandler(onResultsAvailable);
 
+
+		//KU - Set taint propagation handler
+		//System.out.println("***DEBUG: In SetupApplication, about to inst sgpHandler");
+		SGPHandler sgpHandler = new SGPHandler();
+		//System.out.println("***DEBUG: In SetupApplication, finished inst sgpHandler");
+		System.out.println("Setting taint propagation handler...");
+		info.setTaintPropagationHandler(sgpHandler);
+		
 		System.out.println("Starting infoflow computation...");
 		info.setConfig(config);
 		info.setSootConfig(sootConfig);
@@ -693,6 +702,9 @@ public class SetupApplication {
 		info.getConfig().setInspectSources(false);
 		info.getConfig().setInspectSinks(false);
 		
+	
+		
+		
 		if (null != ipcManager) {
 			info.setIPCManager(ipcManager);
 		}
@@ -700,6 +712,9 @@ public class SetupApplication {
 		info.computeInfoflow(apkFileLocation, path, entryPointCreator, sourceSinkManager);
 		this.maxMemoryConsumption = info.getMaxMemoryConsumption();
 
+		//Close taint handler log file
+		sgpHandler.closeFile();
+		
 		return info.getResults();
 	}
 
